@@ -2,15 +2,15 @@ import streamlit as st
 
 #Grade Criteria
 grade_req = {
-    "A+": 80,
-    "A": 75,
-    "A-": 70,
-    "B+": 65,
-    "B": 60,
-    "B-": 55,
-    "C+": 50,
-    "C": 45,
-    "D": 40
+    "A+ (80-100)": 80,
+    "A(75-79)": 75,
+    "A-(70-74)": 70,
+    "B+(65-69)": 65,
+    "B(60-64)": 60,
+    "B-(55-59)": 55,
+    "C+(50-54)": 50,
+    "C(45-49)": 45,
+    "D(40-44)": 40
 }
 
 
@@ -22,7 +22,7 @@ def calc_func(grade,incourse):
 
 
 st.title("MARK CALCULATOR FOR STUDENTS OF BUP")
-st.header("Developed by Farhan Hasan, Undergrad Student BUP, BICE - 2025")
+st.header("Developed by Farhan Hasan, Undergrad Student, BUP, BICE - 2025")
 
 st.write(
     """
@@ -33,7 +33,7 @@ st.write(
 )
 
 st.header("Class Tests")
-st.write("Best 3 class tests out of 4")
+st.write("Best 3 Class Tests Out of 4")
 ct1_total = st.number_input("CT 01 Total Mark", 
                             min_value = 1, 
                             value = 1)
@@ -77,25 +77,36 @@ st.metric("Converted CT Marks", f"{ct_marks:.2f}/10")
 
 #Calculating marks obtained in other criteria
 st.header("Attendance")
-
 attendance = 0
-present = st.number_input("Present",
-                             min_value = 0,
-                             value = 0,
-                             step = 1)
 
-absent = st.number_input("Absent",
-                             min_value = 0,
-                             value = 0,
-                             step = 1)
-total = present + absent
+a_status = st.selectbox("Attendance Marks Given?", ["Yes", "No"])
 
-if total == 0:
-        st.error("Invalid Input for present/absent")
+if a_status == "Yes":
+       attendance = st.number_input("Attendance Marks (out of 10)",
+                       min_value = 0.00,
+                       max_value = 10.00,
+                       value = 0.00,
+                       step = 0.01
+                       )
+else :
+        present = st.number_input("Present",
+                                min_value = 0,
+                                value = 0,
+                                step = 1)
 
-else:
-    attendance = 10*(present / (total))    
-    st.metric("Attendance Mark", f"{attendance:.2f}/10")
+        absent = st.number_input("Absent",
+                                min_value = 0,
+                                value = 0,
+                                step = 1)
+        total = present + absent
+
+        if total == 0:
+                st.error("Invalid Input For Present/Absent")
+
+        else:
+                attendance = 10*(present / (total))    
+
+st.metric("Attendance Mark", f"{attendance:.2f}/10")
 
 
 st.header("Assignment/Presentation/Term-Paper")
@@ -125,9 +136,39 @@ if st.button("Calculate"):
     marks = calc_func(grade, inc)
      
     if marks > 100:
-            st.error(f"{grade} is no longer attainable with your current in-course marks")
+            st.error(f"{grade} Is No Longer Attainable With Current In-Course Marks")
     elif marks <= 0:
-            st.success(f"{grade} is already attained with your current in-course marks")
+            st.success(f"{grade} Is Already Attained With Current In-Course Marks")
 
     else:
-            st.metric(f"Minimum Marks for {grade}", f"{marks:.2f}/100")
+            st.metric(f"Minimum Marks For {grade}", f"{marks:.2f}/100")
+
+
+
+    
+    result = []
+
+    for grade in grade_req:
+
+        marks = calc_func(grade, inc)
+        
+        if marks > 100:
+               status =  "No Longer Attainable With Aurrent In-Course Marks"
+        
+        elif marks <= 0:
+                status = "Already Attained With Current In-Course Marks"
+
+        else:
+                status = f"{marks:.2f}/100"
+        
+        result.append(
+                {
+                       "Grade" : grade,
+                       "Marks Required" : status
+                }
+        )
+    st.subheader("Table Of Grades And Minimum Final Marks Required")
+    st.table(result)
+
+  
+
